@@ -18,6 +18,7 @@ package org.achartengine.model;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.SortedMap;
 
 import org.achartengine.util.IndexXYMap;
@@ -147,6 +148,13 @@ public class XYSeries implements Serializable {
   public synchronized void clear() {
     mXY.clear();
     initRange();
+  }
+
+  public synchronized void setXY(List<PointD> points) {
+    clear();
+    for (PointD point : points) {
+      mXY.put(point.x, point.y);
+    }
   }
 
   /**
