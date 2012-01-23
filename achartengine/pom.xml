@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.achartengine</groupId>
         <artifactId>achartengine-parent</artifactId>
-        <version>0.7.0-willis</version>
+        <version>0.7.0-electicsleep</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>org.achartengine</groupId>
