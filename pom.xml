@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.achartengine</groupId>
 	<artifactId>achartengine-parent</artifactId>
-	<version>0.7.0-willis</version>
+	<version>0.7.0-electricsleep</version>
 	<packaging>pom</packaging>
 
 	<name>AChartEngine (Parent)</name>
