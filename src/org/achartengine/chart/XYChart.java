@@ -283,6 +283,7 @@ public abstract class XYChart extends AbstractChart {
 
     boolean showLabels = mRenderer.isShowLabels() && hasValues;
     boolean showGrid = mRenderer.isShowGrid();
+    boolean showXGrid = showGrid && mRenderer.isShowXGrid();
     boolean showCustomTextGrid = mRenderer.isShowCustomTextGrid();
     if (showLabels || showGrid) {
       List<Double> xLabels = getValidLabels(MathHelper.getLabels(minX[0], maxX[0], mRenderer
@@ -326,7 +327,7 @@ public abstract class XYChart extends AbstractChart {
                     .getYLabelsAngle());
               }
             }
-            if (showGrid) {
+            if (showXGrid) {
               paint.setColor(mRenderer.getGridColor());
               canvas.drawLine(left, yLabel, right, yLabel, paint);
             }
@@ -337,7 +338,7 @@ public abstract class XYChart extends AbstractChart {
               drawText(canvas, getLabel(label), right + 10, yLabel - 2, paint, mRenderer
                   .getYLabelsAngle());
             }
-            if (showGrid) {
+            if (showXGrid) {
               paint.setColor(mRenderer.getGridColor());
               canvas.drawLine(right, yLabel, left, yLabel, paint);
             }

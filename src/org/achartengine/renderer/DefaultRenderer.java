@@ -65,6 +65,8 @@ public class DefaultRenderer implements Serializable {
   private boolean mFitLegend = false;
   /** If the grid should be displayed. */
   private boolean mShowGrid = false;
+  /** If the x grid should be displayed. */
+  private boolean mShowXGrid = false;
   /** If the custom text grid should be displayed. */
   private boolean mShowCustomTextGrid = false;
   /** The simple renderers that are included in this multiple series renderer. */
@@ -336,7 +338,25 @@ public class DefaultRenderer implements Serializable {
   public void setShowGrid(boolean showGrid) {
     mShowGrid = showGrid;
   }
-
+  
+  /**
+   * Returns if the x grid should be visible.
+   * 
+   * @return the visibility flag for the x grid
+   */
+  public boolean isShowXGrid() {
+    return mShowXGrid;
+  }
+  
+  /**
+   * Sets if the x grid should be visible.
+   * 
+   * @param showXGrid the visibility flag for the x grid
+   */
+  public void setShowXGrid(boolean showXGrid) {
+    this.mShowXGrid = showXGrid;
+  }
+  
   /**
    * Returns if the grid should be visible for custom X or Y labels.
    * 
