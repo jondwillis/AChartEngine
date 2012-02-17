@@ -66,7 +66,7 @@ public class DefaultRenderer implements Serializable {
   /** If the grid should be displayed. */
   private boolean mShowGrid = false;
   /** If the x grid should be displayed. */
-  private boolean mShowXGrid = false;
+  private boolean mShowXGrid = true;
   /** If the custom text grid should be displayed. */
   private boolean mShowCustomTextGrid = false;
   /** The simple renderers that are included in this multiple series renderer. */
