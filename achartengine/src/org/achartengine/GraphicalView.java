@@ -37,16 +37,15 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Build;
 import android.os.Handler;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
 /**
  * The view that encapsulates the graphical chart.
  */
-public abstract class GraphicalView extends View {
+public class GraphicalView extends View {
   /** The chart to be drawn. */
-  protected AbstractChart mChart;
+  private AbstractChart mChart;
   /** The chart renderer. */
   private DefaultRenderer mRenderer;
   /** The view bounds. */
@@ -80,35 +79,14 @@ public abstract class GraphicalView extends View {
   /** The old y coordinate. */
   private float oldY;
 
-
-  /**
-   * Creates a new graphical view.
-   * 
-   * @param context
-   *            the context
-   * @param chart
-   *            the chart to be drawn
-   */
-  public GraphicalView(Context context) {
-          super(context);
-          setup(context);
-  }
-
-  public GraphicalView(final Context context, final AttributeSet as) {
-          super(context, as);
-          setup(context);
-  }
-
-  protected abstract AbstractChart buildChart();
-  
   /**
    * Creates a new graphical view.
    * 
    * @param context the context
    * @param chart the chart to be drawn
    */
-  public void setup(Context context) {
-    AbstractChart chart = buildChart();
+  public GraphicalView(Context context, AbstractChart chart) {
+    super(context);
     mChart = chart;
     mHandler = new Handler();
     if (mChart instanceof XYChart) {
