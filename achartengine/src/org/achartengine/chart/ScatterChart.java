@@ -21,7 +21,9 @@ import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.renderer.SimpleSeriesRenderer;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
+import org.achartengine.util.SerializableBitmap;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
@@ -113,6 +115,16 @@ public class ScatterChart extends XYChart {
         drawDiamond(canvas, paint, path, points.get(i), points.get(i + 1));
       }
       break;
+    case IMAGE:
+      SerializableBitmap sb = renderer.getBitmap();
+      Bitmap bitmap = null;
+      if(sb!=null){
+        bitmap = sb.getBitmap();
+      }
+      for (int i = 0; i < length; i += 2) {
+        drawImage(canvas, paint, points.get(i), points.get(i + 1), bitmap);
+      }
+      break;
     case POINT:
       for (int i = 0; i < length; i += 2) {
         canvas.drawPoint(points.get(i), points.get(i + 1), paint);
@@ -179,8 +191,18 @@ public class ScatterChart extends XYChart {
     case DIAMOND:
       drawDiamond(canvas, paint, new float[8], x + SHAPE_WIDTH, y);
       break;
+    case IMAGE:
+      SerializableBitmap sb = ((XYSeriesRenderer)renderer).getBitmap();
+      Bitmap bitmap = null;
+      if(sb!=null){
+        bitmap = sb.getBitmap();
+      }
+      drawImage(canvas, paint, x, y, bitmap);
+      break;
     case POINT:
       canvas.drawPoint(x + SHAPE_WIDTH, y, paint);
+      break;
+    default:
       break;
     }
   }
@@ -260,6 +282,23 @@ public class ScatterChart extends XYChart {
     path[6] = x + size;
     path[7] = y;
     drawPath(canvas, path, paint, true);
+  }
+
+  /**
+   * The graphical representation of an image.
+   * 
+   * @param canvas the canvas to paint to
+   * @param paint the paint to be used for drawing
+   * @param x the x value of the point the image should be drawn at
+   * @param y the y value of the point the image should be drawn at
+   * @param bitmap the image to be drawn
+   */
+  private void drawImage(Canvas canvas, Paint paint, float x, float y, Bitmap bitmap) {
+    if(bitmap==null){
+      canvas.drawRect(x - size, y - size, x + size, y + size, paint);
+    } else {
+      canvas.drawBitmap(bitmap, x-bitmap.getWidth()/2, y-bitmap.getHeight()/2, paint);
+    }
   }
 
   /**

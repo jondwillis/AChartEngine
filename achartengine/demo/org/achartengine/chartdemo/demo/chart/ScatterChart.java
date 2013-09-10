@@ -21,8 +21,10 @@ import java.util.Random;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.chart.PointStyle;
+import org.achartengine.chartdemo.demo.R;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
+import org.achartengine.util.SerializableBitmap;
 
 import android.content.Context;
 import android.content.Intent;
@@ -57,7 +59,7 @@ public class ScatterChart extends AbstractDemoChart {
    * @return the built intent
    */
   public Intent execute(Context context) {
-    String[] titles = new String[] { "Series 1", "Series 2", "Series 3", "Series 4", "Series 5" };
+    String[] titles = new String[] { "Series 1", "Series 2", "Series 3", "Series 4", "Series 5", "Series 6" };
     List<double[]> x = new ArrayList<double[]>();
     List<double[]> values = new ArrayList<double[]>();
     int count = 20;
@@ -73,12 +75,13 @@ public class ScatterChart extends AbstractDemoChart {
       x.add(xValues);
       values.add(yValues);
     }
-    int[] colors = new int[] { Color.BLUE, Color.CYAN, Color.MAGENTA, Color.LTGRAY, Color.GREEN };
+    int[] colors = new int[] { Color.BLUE, Color.CYAN, Color.MAGENTA, Color.LTGRAY, Color.GREEN, -1 };
     PointStyle[] styles = new PointStyle[] { PointStyle.X, PointStyle.DIAMOND, PointStyle.TRIANGLE,
-        PointStyle.SQUARE, PointStyle.CIRCLE };
-    XYMultipleSeriesRenderer renderer = buildRenderer(colors, styles);
-    setChartSettings(renderer, "Scatter chart", "X", "Y", -10, 30, -10, 51, Color.GRAY,
-        Color.LTGRAY);
+        PointStyle.SQUARE, PointStyle.CIRCLE, PointStyle.IMAGE };
+    SerializableBitmap mBitmap = new SerializableBitmap(context, R.drawable.achartengine, 30, 30);
+    SerializableBitmap[] bitmaps = new SerializableBitmap[] {null,null,null,null,null,mBitmap};
+    XYMultipleSeriesRenderer renderer = buildRenderer(colors, styles, bitmaps);
+    setChartSettings(renderer, "Scatter chart", "X", "Y", -10, 30, -10, 51, Color.GRAY, Color.LTGRAY);
     renderer.setXLabels(10);
     renderer.setYLabels(10);
     length = renderer.getSeriesRendererCount();
