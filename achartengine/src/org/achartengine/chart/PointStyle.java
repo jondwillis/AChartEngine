@@ -19,8 +19,7 @@ package org.achartengine.chart;
  * The chart point style enumerator.
  */
 public enum PointStyle {
-  X("x"), CIRCLE("circle"), TRIANGLE("triangle"), SQUARE("square"), DIAMOND("diamond"), POINT(
-      "point");
+  X("x"), CIRCLE("circle"), TRIANGLE("triangle"), SQUARE("square"), DIAMOND("diamond"), POINT("point"), IMAGE("image");
 
   /** The point shape name. */
   private String mName;

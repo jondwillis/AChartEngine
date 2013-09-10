@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.achartengine.chart.PointStyle;
 import org.achartengine.renderer.XYSeriesRenderer.FillOutsideLine.Type;
+import org.achartengine.util.SerializableBitmap;
 
 import android.graphics.Color;
 import android.graphics.Paint.Align;
@@ -55,6 +56,8 @@ public class XYSeriesRenderer extends SimpleSeriesRenderer {
   private Align mAnnotationsTextAlign = Align.CENTER;
   /** The annotations color. */
   private int mAnnotationsColor = DefaultRenderer.TEXT_COLOR;
+  /** The bitmap for the image to be drawn (for PointStyle.IMAGE) */
+  private SerializableBitmap mBitmap = null;
 
   /**
    * A descriptor for the line fill behavior.
@@ -227,7 +230,25 @@ public class XYSeriesRenderer extends SimpleSeriesRenderer {
   public void setPointStyle(PointStyle style) {
     mPointStyle = style;
   }
+  
+  /**
+   * Returns the bitmap.
+   * 
+   * @return the bitmap
+   */
+  public SerializableBitmap getBitmap() {
+    return mBitmap;
+  }
 
+  /**
+   * Sets the bitmap.
+   * 
+   * @param bitmaps the bitmap to be drawn
+   */
+  public void setBitmap(SerializableBitmap bitmaps) {
+    mBitmap = bitmaps;
+  }
+  
   /**
    * Returns the point stroke width in pixels.
    * 

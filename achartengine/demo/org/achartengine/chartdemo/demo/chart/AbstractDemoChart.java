@@ -28,6 +28,7 @@ import org.achartengine.renderer.DefaultRenderer;
 import org.achartengine.renderer.SimpleSeriesRenderer;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
+import org.achartengine.util.SerializableBitmap;
 
 /**
  * An abstract class for the demo charts to extend. It contains some methods for
@@ -77,17 +78,48 @@ public abstract class AbstractDemoChart implements IDemoChart {
     setRenderer(renderer, colors, styles);
     return renderer;
   }
-
+  
+  /**
+   * Builds an XY multiple series renderer.
+   * 
+   * @param colors the series rendering colors
+   * @param styles the series point styles
+   * @param bitmaps the series rendering images
+   * @return the XY multiple series renderers
+   */
+  protected XYMultipleSeriesRenderer buildRenderer(int[] colors, PointStyle[] styles, SerializableBitmap[] bitmaps) {
+    XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
+    setRenderer(renderer, colors, styles, bitmaps);
+    return renderer;
+  }
+  
   protected void setRenderer(XYMultipleSeriesRenderer renderer, int[] colors, PointStyle[] styles) {
+    renderer.setAxisTitleTextSize(16);
+    renderer.setChartTitleTextSize(20);
+    renderer.setLabelsTextSize(15);
+    renderer.setLegendTextSize(15);
+    renderer.setPointSize(5f); 
+    renderer.setMargins(new int[] { 20, 30, 15, 20 });
+    int length = colors.length;
+    for (int i = 0; i < length; i++) {
+      XYSeriesRenderer r = new XYSeriesRenderer();
+      r.setColor(colors[i]);
+      r.setPointStyle(styles[i]);
+      renderer.addSeriesRenderer(r);
+    }
+  }
+  
+  protected void setRenderer(XYMultipleSeriesRenderer renderer, int[] colors, PointStyle[] styles, SerializableBitmap[] bitmaps) {
     renderer.setAxisTitleTextSize(16);
     renderer.setChartTitleTextSize(20);
     renderer.setLabelsTextSize(15);
     renderer.setLegendTextSize(15);
     renderer.setPointSize(5f);
     renderer.setMargins(new int[] { 20, 30, 15, 20 });
-    int length = colors.length;
+    int length = bitmaps.length;
     for (int i = 0; i < length; i++) {
       XYSeriesRenderer r = new XYSeriesRenderer();
+      r.setBitmap(bitmaps[i]);
       r.setColor(colors[i]);
       r.setPointStyle(styles[i]);
       renderer.addSeriesRenderer(r);
