@@ -15,18 +15,26 @@
  */
 package org.achartengine.chart;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.achartengine.model.MultipleCategorySeries;
+import org.achartengine.model.Point;
+import org.achartengine.model.SeriesSelection;
 import org.achartengine.renderer.DefaultRenderer;
 import org.achartengine.renderer.SimpleSeriesRenderer;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
+import android.graphics.Path;
+import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Region;
+import android.util.Log;
 
 /**
  * The doughnut chart rendering class.
@@ -36,6 +44,9 @@ public class DoughnutChart extends RoundChart {
   private MultipleCategorySeries mDataset;
   /** A step variable to control the size of the legend shape. */
   private int mStep;
+  
+  /** Handles returning values when tapping on Doughnut Chart */
+  private DoughnutMapper mDoughnutMapper;
 
   /**
    * Builds a new doughnut chart instance.
@@ -46,6 +57,7 @@ public class DoughnutChart extends RoundChart {
   public DoughnutChart(MultipleCategorySeries dataset, DefaultRenderer renderer) {
     super(null, renderer);
     mDataset = dataset;
+    mDoughnutMapper = new DoughnutMapper();
   }
 
   /**
@@ -63,38 +75,78 @@ public class DoughnutChart extends RoundChart {
     paint.setAntiAlias(mRenderer.isAntialiasing());
     paint.setStyle(Style.FILL);
     paint.setTextSize(mRenderer.getLabelsTextSize());
+    
+    // List of the labels on the doughnut
+    List<RectF> prevLabelsBounds = new ArrayList<RectF>();
+    
+    // Defining the shape of the doughnut. Bottom is defined after legend
+    int marginAngle = 3;
     int legendSize = getLegendSize(mRenderer, height / 5, 0);
     int left = x;
     int top = y;
     int right = x + width;
+    
+    // Defining how much data categories there are
     int cLength = mDataset.getCategoriesCount();
     String[] categories = new String[cLength];
     for (int category = 0; category < cLength; category++) {
       categories[category] = mDataset.getCategory(category);
     }
+    
+    // If a legend fits, add one
     if (mRenderer.isFitLegend()) {
       legendSize = drawLegend(canvas, mRenderer, categories, left, right, y, width, height,
           legendSize, paint, true);
     }
-
     int bottom = y + height - legendSize;
+    
+    // Draw the background of the screen
     drawBackground(mRenderer, canvas, x, y, width, height, paint, false, DefaultRenderer.NO_COLOR);
+    // Used for the legend
     mStep = SHAPE_WIDTH * 3 / 4;
 
+    
     int mRadius = Math.min(Math.abs(right - left), Math.abs(bottom - top));
-    double rCoef = 0.35 * mRenderer.getScale();
-    double decCoef = 0.2 / cLength;
+    // Used to define the scale of the radius of the doughnut
+    double rCoef = 0.4 * mRenderer.getScale();
+    // Used to define the scale of the width of the doughnut
+    double decCoef = 0.1 / cLength;
+    
+    // Radius of the doughnut
     int radius = (int) (mRadius * rCoef);
+    // Radius of doughnut hole
+    int holeRadius = (int) (radius - mRadius * decCoef);
+    
+    // Define the center of the doughnut
     if (mCenterX == NO_VALUE) {
       mCenterX = (left + right) / 2;
     }
     if (mCenterY == NO_VALUE) {
       mCenterY = (bottom + top) / 2;
     }
-    float shortRadius = radius * 0.9f;
-    float longRadius = radius * 1.1f;
-    List<RectF> prevLabelsBounds = new ArrayList<RectF>();
+    
+    // Hook in clip detection after center has been calculated
+    mDoughnutMapper.setDimensions(radius, mCenterX, mCenterY);
+    boolean loadDoughnutCfg = !mDoughnutMapper.areAllSegmentPresent(cLength);
+    if (loadDoughnutCfg) {
+      mDoughnutMapper.clearPieSegments();
+    }
+    mDoughnutMapper.setDimensions(radius - (int)(mRadius*decCoef), radius, mCenterX, mCenterY);
+    
+    // Distance for the legend labels
+    float shortLegendRadius = radius * 0.9f;
+    float longLegendRadius = radius * 1.1f;
+    
+    // Add a transparent center to the doughnut
+    Rect oldClipBounds = canvas.getClipBounds();
+    Path doughnutHole = new Path();
+    doughnutHole.addCircle(mCenterX, mCenterY, holeRadius, Path.Direction.CCW);
+    canvas.clipPath(doughnutHole, Region.Op.DIFFERENCE);
+    
+    
     for (int category = 0; category < cLength; category++) {
+      
+      // Fetch all of the informatoin in the category
       int sLength = mDataset.getItemCount(category);
       double total = 0;
       String[] titles = new String[sLength];
@@ -102,6 +154,8 @@ public class DoughnutChart extends RoundChart {
         total += mDataset.getValues(category)[i];
         titles[i] = mDataset.getTitles(category)[i];
       }
+      
+      // Define the characteristics for the category
       float currentAngle = mRenderer.getStartAngle();
       RectF oval = new RectF(mCenterX - radius, mCenterY - radius, mCenterX + radius, mCenterY
           + radius);
@@ -109,28 +163,47 @@ public class DoughnutChart extends RoundChart {
         paint.setColor(mRenderer.getSeriesRendererAt(i).getColor());
         float value = (float) mDataset.getValues(category)[i];
         float angle = (float) (value / total * 360);
-        canvas.drawArc(oval, currentAngle, angle, true, paint);
+        
+        // Draw the arc and the label for the category
+        canvas.drawArc(oval, currentAngle+marginAngle, angle-marginAngle, true, paint);
         drawLabel(canvas, mDataset.getTitles(category)[i], mRenderer, prevLabelsBounds, mCenterX,
-            mCenterY, shortRadius, longRadius, currentAngle, angle, left, right,
+            mCenterY, shortLegendRadius, longLegendRadius, currentAngle, angle, left, right,
             mRenderer.getLabelsColor(), paint, true, false);
+        
+        // Save details for getSeries functionality
+        if (loadDoughnutCfg) {
+          mDoughnutMapper.addPieSegment(i, value, currentAngle, angle);
+        }
         currentAngle += angle;
       }
-      radius -= (int) mRadius * decCoef;
-      shortRadius -= mRadius * decCoef - 2;
+      
+      // Checking the background of the renderer. Defining a color
       if (mRenderer.getBackgroundColor() != 0) {
         paint.setColor(mRenderer.getBackgroundColor());
       } else {
         paint.setColor(Color.WHITE);
       }
       paint.setStyle(Style.FILL);
-      oval = new RectF(mCenterX - radius, mCenterY - radius, mCenterX + radius, mCenterY + radius);
-      canvas.drawArc(oval, 0, 360, true, paint);
-      radius -= 1;
+      shortLegendRadius -= mRadius * decCoef - 2;
     }
+    canvas.clipRect(oldClipBounds, Region.Op.REPLACE);
     prevLabelsBounds.clear();
-    drawLegend(canvas, mRenderer, categories, left, right, y, width, height, legendSize, paint,
+    drawLegend(canvas, mRenderer, mDataset.getTitles(0), left, right, y, width, height, legendSize, paint,
         false);
     drawTitle(canvas, x, y, width, paint);
+    
+    // Display the values at the center
+    if (mRenderer.isCenterDisplay() != -1)
+    {
+      Paint textPaint = new Paint();
+      textPaint.setTextAlign(Align.CENTER);
+      textPaint.setTextSize(60);
+      textPaint.setColor(mRenderer.getDisplayColor());
+      drawString(canvas, 
+          mDataset.getTitles(0)[mRenderer.isCenterDisplay()]+"\n"+
+     mDataset.getValues(0)[mRenderer.isCenterDisplay()]
+          , mCenterX, mCenterY, textPaint);
+    }
   }
 
   /**
@@ -155,8 +228,34 @@ public class DoughnutChart extends RoundChart {
    */
   public void drawLegendShape(Canvas canvas, SimpleSeriesRenderer renderer, float x, float y,
       int seriesIndex, Paint paint) {
-    mStep--;
-    canvas.drawCircle(x + SHAPE_WIDTH - mStep, y, mStep, paint);
+    // mStep--;
+    canvas.drawCircle(x + SHAPE_WIDTH - mStep, y - mStep, mStep, paint);
   }
 
+  @Override
+  public SeriesSelection getSeriesAndPointForScreenCoordinate(Point screenPoint) {
+    return mDoughnutMapper.getSeriesAndPointForScreenCoordinate(screenPoint);
+  }
+
+ /**
+  * Draw a multiple lines string.
+  * 
+  * @param canvas the canvas to paint to
+  * @param text the text to be painted
+  * @param x the x value of the area to draw to
+  * @param y the y value of the area to draw to
+  * @param paint the paint to be used for drawing
+  */
+ public void drawString(Canvas canvas, String text, float x, float y, Paint paint) {
+   if (text != null) {
+     String[] lines = text.split("\n");
+     Rect rect = new Rect();
+     int yOff = 0;
+     for (int i = 0; i < lines.length; ++i) {
+       canvas.drawText(lines[i], x, y + yOff, paint);
+       paint.getTextBounds(lines[i], 0, lines[i].length(), rect);
+       yOff = yOff + rect.height() + 5; // space between lines is 5
+     }
+   }
+ }
 }

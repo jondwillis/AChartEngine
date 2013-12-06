@@ -99,8 +99,8 @@ public abstract class AbstractChart implements Serializable {
       int right, int y, int width, int height, int legendSize, Paint paint, boolean calculate) {
     float size = 32;
     if (renderer.isShowLegend()) {
-      float currentX = left;
-      float currentY = y + height - legendSize + size;
+      float currentX = left+size;
+      float currentY = y + height - legendSize;
       paint.setTextAlign(Align.LEFT);
       paint.setTextSize(renderer.getLegendTextSize());
       int sLength = Math.min(titles.length, renderer.getSeriesRendererCount());
@@ -120,7 +120,7 @@ public abstract class AbstractChart implements Serializable {
           for (float value : widths) {
             sum += value;
           }
-          float extraSize = lineSize + 10 + sum;
+          float extraSize = renderer.getLegendTextSize() + 5;
           float currentWidth = currentX + extraSize;
 
           if (i > 0 && getExceed(currentWidth, renderer, right, width)) {
@@ -141,7 +141,7 @@ public abstract class AbstractChart implements Serializable {
             drawLegendShape(canvas, r, currentX, currentY, i, paint);
             drawString(canvas, text, currentX + lineSize + 5, currentY + 5, paint);
           }
-          currentX += extraSize;
+          currentY += extraSize;
         }
       }
     }
@@ -157,7 +157,7 @@ public abstract class AbstractChart implements Serializable {
    * @param y the y value of the area to draw to
    * @param paint the paint to be used for drawing
    */
-  protected void drawString(Canvas canvas, String text, float x, float y, Paint paint) {
+  public void drawString(Canvas canvas, String text, float x, float y, Paint paint) {
     if (text != null) {
       String[] lines = text.split("\n");
       Rect rect = new Rect();

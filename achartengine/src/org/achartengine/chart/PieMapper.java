@@ -31,7 +31,7 @@ public class PieMapper implements Serializable {
 
   private int mPieChartRadius;
 
-  private int mCenterX, mCenterY;
+  protected int mCenterX, mCenterY;
 
   /**
    * Set PieChart location on screen.
@@ -129,6 +129,7 @@ public class PieMapper implements Serializable {
 
       for (PieSegment pieSeg : mPieSegmentList) {
         if (pieSeg.isInSegment(angleFromPieCenter)) {
+       //   Log.d("ELEMENTS IN PIEMAPPER", Float.toString(pieSeg.getStartAngle()) + " to " + Float.toString(pieSeg.getEndAngle()));
           return new SeriesSelection(0, pieSeg.getDataIndex(), pieSeg.getValue(),
               pieSeg.getValue());
         }
