@@ -101,7 +101,11 @@ public class DefaultRenderer implements Serializable {
   private int selectableBuffer = 15;
   /** If the chart should display the values (available for pie chart). */
   private boolean mDisplayValues;
-
+  /** If the chart should display the index of selected segment at the center*/
+  private int mCenterDisplay;
+  /** Color of the text if displayed in the center */
+  private int mDisplayColor;
+  
   /**
    * A flag to be set if the chart is inside a scroll and doesn't need to shrink
    * when not enough space.
@@ -796,6 +800,41 @@ public class DefaultRenderer implements Serializable {
    */
   public void setDisplayValues(boolean display) {
     mDisplayValues = display;
+  }
+
+  /**
+   * Set the index of the text to be displayed
+   * 
+   * @param display if the values should be displayed as text
+   */
+  public void setCenterDisplay(int index) {
+    mCenterDisplay = index;
+  }
+  /**
+   * Returns if the values should be displayed as text.
+   * 
+   * @return if the values should be displayed as text
+   */
+  public int isCenterDisplay() {
+    return mCenterDisplay;
+  }
+  
+  /**
+   * Set the color to be displayed for drawString
+   * @param color
+   */
+  public void setDisplayColor(int color)
+  {
+    mDisplayColor = color;
+  }
+  
+  /**
+   * Return the color of the text to be displayed
+   * @return
+   */
+  public int getDisplayColor()
+  {
+    return mDisplayColor;
   }
 
 }
